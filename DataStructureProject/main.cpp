@@ -162,19 +162,19 @@ void QueryPolygon(std::fstream &fin, std::fstream &fout) {
     std::vector<int> query_answer;
     switch (environment_variable) {
         case 2: {
-            QueryPolygonFromAddPointBeforeQueryPolygon(n, polygon);
+            query_answer = QueryPolygonFromAddPointBeforeQueryPolygon(n, polygon);
             break;
         }
         case 3: {
-            QueryPolygonFromAddBeforeQuery(n, polygon);
+            query_answer = QueryPolygonFromAddBeforeQuery(n, polygon);
             break;
         }
         case 5: {
-            QueryPolygonFromMixQueryPolygon(n, polygon);
+            query_answer = QueryPolygonFromMixQueryPolygon(n, polygon);
             break;
         }
         case 6: {
-            QueryPolygonFromMixQuery(n, polygon);
+            query_answer = QueryPolygonFromMixQuery(n, polygon);
             break;
         }
         default: {
@@ -232,6 +232,7 @@ int main() {
             case 2: {
                 // Delete Point
                 DeletePoint(fin);
+                break;
             }
             case 3: {
                 // Query Point
@@ -246,6 +247,7 @@ int main() {
             case 5: {
                 // Delete Polygon
                 DeletePolygon(fin);
+                break;
             }
             case 6: {
                 // QueryPolygon
