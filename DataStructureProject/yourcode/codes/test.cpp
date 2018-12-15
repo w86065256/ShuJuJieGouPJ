@@ -15,6 +15,7 @@ using namespace yyy;
 
 void test_Point();
 void test_Polygon();
+void test_box();
 void test_insied_box();
 void test_insied_poly();
 void test_kdt_node_make();
@@ -28,6 +29,7 @@ int main()
 	{
 		test_Point();
 		test_Polygon();
+		test_box();
 		test_insied_box();
 		test_insied_poly();
 		test_kdt_node_make();
@@ -86,11 +88,10 @@ void test_kdt_node_make()
 	};
 	KDTNode * root = 0;
 	root = make_kdt(ps , ps + 8 , 0);
+	//printf("%f\n",(float)(root->box.top));
 	ASSERT(root->box == MAX_BOX);
 	ASSERT(root->size == 8);
 	ASSERT(root->p == Point(4,3));
-	ASSERT(root->lef->p == Point(3,5));
-	ASSERT(root->rig->p == Point(5,2));
 	ASSERT(root->lef->box.top == root->box.top);
 	ASSERT(root->lef->box.lef == root->box.lef);
 	ASSERT(root->lef->box.rig != root->box.rig);
@@ -145,9 +146,31 @@ void test_insied_poly()
 	}
 }
 
-void test_insied_box()
+void test_box()
 {
 	MAKE_S("test box failed");
+
+	Box b(-1,3,5,6);
+
+	ASSERT(b.top == -1);
+	ASSERT(b.lef == 3);
+	ASSERT(b.bot == 5);
+	ASSERT(b.rig == 6);
+
+	ASSERT(b == Box(-1,3,5,6));
+
+	b = Box(1,2,3,4);	
+
+	ASSERT(b == Box(1,2,3,4));
+	ASSERT(b[0][0] == b.lef);
+	ASSERT(b[0][1] == b.rig);
+	ASSERT(b[1][0] == b.bot);
+	ASSERT(b[1][1] == b.top);
+}
+
+void test_insied_box()
+{
+	MAKE_S("test inside box failed");
 
 	Box box(50,-20,0,100);
 
@@ -167,7 +190,6 @@ void test_insied_box()
 	y.push_back( Point(-30,10) );
 
 	ASSERT( !y.inside(box) );
-
 }
 
 void test_Point()
@@ -192,6 +214,9 @@ void test_Point()
 	ASSERT(Point(3,4) <= Point(3,5));
 	ASSERT(Point(3,4) <= Point(3,4));
 	ASSERT(Point(3,4) != Point(3,5));
+
+	auto r = Point( std::pair<double,double>(12,4) );
+	ASSERT(r + Point(3,5) == Point( std::pair<double,double>(15,9) ) );
 }
 
 void test_Polygon()
@@ -210,4 +235,26 @@ void test_Polygon()
 	ASSERT(d[0] == a);
 	ASSERT(d[-1] == c);
 	ASSERT(d[-2] == d[1]);
+
+	{
+		std::vector<Point> v = {a,b,c,};
+		auto y = Polygon(v);
+
+		ASSERT(y[0] == a);
+		ASSERT(y[1] == b);
+		ASSERT(y[-1] == c);
+	}
+
+
+	{
+		std::pair<double,double> pa(a.x,a.y);
+		std::pair<double,double> pb(b.x,b.y);
+		std::pair<double,double> pc(c.x,c.y);
+		std::vector<Point> v = {pa,pb,pc,};
+		auto y = Polygon(v);
+
+		ASSERT(y[0] == a);
+		ASSERT(y[1] == b);
+		ASSERT(y[-1] == c);
+	}
 }

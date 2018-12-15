@@ -2,6 +2,7 @@
 #define _YYY_POINT_H_
 
 #include <iostream>
+#include <map>
 
 #include "Box.h"
 
@@ -16,6 +17,8 @@ namespace yyy
 		int num;
 
 		Point(double x = 0,double y = 0 , int number = -1);
+		Point( std::pair<double,double> p , int number = -1);
+		
 		double & operator [](int k);
 		double operator [](int k)const;
 

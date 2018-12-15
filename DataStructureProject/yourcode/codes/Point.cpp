@@ -11,6 +11,13 @@ namespace yyy
 		num = number;
 	}
 
+	Point::Point( std::pair<double,double> p , int number)
+	{
+		this->x = p.first;
+		this->y = p.second;
+		num = number;
+	}
+
 	double & Point::operator [](int k)
 	{
 		if(k == 0)

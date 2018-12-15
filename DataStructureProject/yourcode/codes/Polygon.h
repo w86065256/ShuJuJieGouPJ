@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <iostream>
+#include <map>
 #include "Point.h"
 #include "Box.h"
 
@@ -18,9 +19,12 @@ namespace yyy
 		int num;
 
 		Polygon(int number = -1);
+		Polygon(std::vector<Point> vec , int number = -1);
+		Polygon(std::vector< std::pair<double,double> > vec , int number = -1);
 
 		bool inside(const Box & b);
 		bool cross(const Box & b);	//相交
+		bool inside_or_cross(const Box & b);	//有重合部分
 
 		Point & operator [](int k);
 		const Point & operator [](int k)const;

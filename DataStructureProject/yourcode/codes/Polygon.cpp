@@ -4,7 +4,19 @@ namespace yyy
 {
 	Polygon::Polygon(int number)
 	{
-		num = 0;
+		num = number;
+	}
+
+	Polygon::Polygon(std::vector<Point> vec , int number)
+	{
+		v = vec;
+		num = number;
+	}
+	Polygon::Polygon(std::vector< std::pair<double,double> > vec , int number)
+	{
+		for(int i = 0;i < vec.size();i++)
+			v.push_back( Point(vec[i]) );
+		num = number;
 	}
 
 	bool Polygon::inside(const Box & b)
@@ -16,6 +28,12 @@ namespace yyy
 		}
 		return true;
 	}
+
+	bool Polygon::inside_or_cross(const Box & b)
+	{
+		return inside(b) or cross(b);
+	}
+
 	Polygon::iterator Polygon::begin()
 	{
 		return v.begin();
