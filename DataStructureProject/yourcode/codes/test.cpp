@@ -1,10 +1,11 @@
-#include "Polygon.h"
-#include "Point.h"
-#include "Box.h"
 #include <iostream>
 #include <map>
 #include <time.h>
 #include <stdlib.h>
+#include "Polygon.h"
+#include "Point.h"
+#include "Box.h"
+#include "KDTree.h"
 
 using namespace yyy;
 
@@ -16,6 +17,8 @@ void test_Point();
 void test_Polygon();
 void test_insied_box();
 void test_insied_poly();
+void test_kdt_node_make();
+void test_polygon_cross_box();
 
 int main()
 {
@@ -27,6 +30,8 @@ int main()
 		test_Polygon();
 		test_insied_box();
 		test_insied_poly();
+		test_kdt_node_make();
+		test_polygon_cross_box();
 	}
 	catch (std::pair<const char * , int> s)
 	{
@@ -43,6 +48,57 @@ int main()
 
 
 	return 0;
+}
+
+void test_polygon_cross_box()
+{
+	MAKE_S("test_polygon_cross_box fail");
+
+	Point p1(1,0);
+	Point p2(1.5,2);
+	Point p3(0,1);
+
+	Polygon pol;
+	pol.push_back(p1);
+	pol.push_back(p2);
+	pol.push_back(p3);
+
+	Box box1(4,-1,0,.5);
+	Box box2(5,3,2,5);
+
+	ASSERT(pol.cross(box1));
+	ASSERT(! pol.cross(box2));
+}
+
+void test_kdt_node_make()
+{
+	MAKE_S("test_kdt_node_make fail");
+
+	Point ps[8] = {
+		Point(3,5),
+		Point(6,3),
+		Point(2,1),
+		Point(6,1),
+		Point(1,5),
+		Point(1,7),
+		Point(5,2),
+		Point(4,3),
+	};
+	KDTNode * root = 0;
+	root = make_kdt(ps , ps + 8 , 0);
+	ASSERT(root->box == MAX_BOX);
+	ASSERT(root->size == 8);
+	ASSERT(root->p == Point(4,3));
+	ASSERT(root->lef->p == Point(3,5));
+	ASSERT(root->rig->p == Point(5,2));
+	ASSERT(root->lef->box.top == root->box.top);
+	ASSERT(root->lef->box.lef == root->box.lef);
+	ASSERT(root->lef->box.rig != root->box.rig);
+	ASSERT(root->rig->box.bot == root->box.bot);
+	ASSERT(root->rig->box.rig == root->box.rig);
+	ASSERT(root->rig->box.lef != root->box.lef);
+
+	delete root;
 }
 
 void test_insied_poly()

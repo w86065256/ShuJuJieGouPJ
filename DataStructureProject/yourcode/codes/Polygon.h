@@ -20,6 +20,7 @@ namespace yyy
 		Polygon(int number = -1);
 
 		bool inside(const Box & b);
+		bool cross(const Box & b);	//相交
 
 		Point & operator [](int k);
 		const Point & operator [](int k)const;
@@ -31,6 +32,7 @@ namespace yyy
 		unsigned size()const;
 
 		void push_back(const Point & a);
+
 	};
 }
 

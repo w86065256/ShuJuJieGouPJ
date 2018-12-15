@@ -2,10 +2,18 @@
 #define _YYY_METHODS_H_
 
 #include <stdlib.h>
+#include "Box.h"
+#include "Point.h"
 
 namespace yyy
 {
+	struct Box;
+	struct KDTNode;
+
 	const double EPS = 1e-9;
+	const double INF = 1e9;
+
+	const Box MAX_BOX = Box(INF , -INF , -INF , INF);
 
 	inline double ABS(double x)			{return x < 0. ? -x : x;}
 
@@ -43,6 +51,15 @@ namespace yyy
 	{
 		return (double)rand() / (double)RAND_MAX;
 	}
+
+	struct cmp
+	{
+		int focus;
+		cmp(int focus = 0);
+		bool operator () (const Point & a,const Point & b);
+	};
+
+	int get_size(KDTNode * d);
 }
 
 #endif //_YYY_METHODS_H_

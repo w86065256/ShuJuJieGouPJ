@@ -17,6 +17,7 @@ namespace yyy
 
 		Point(double x = 0,double y = 0 , int number = -1);
 		double & operator [](int k);
+		double operator [](int k)const;
 
 		Point & operator += (const Point & v);
 		Point & operator -= (const Point & v);

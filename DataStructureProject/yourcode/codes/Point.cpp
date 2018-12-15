@@ -20,6 +20,15 @@ namespace yyy
 		throw "Point.operator[] : bad index";
 	}
 
+	double Point::operator [](int k)const
+	{
+		if(k == 0)
+			return x; 
+		if(k == 1)
+			return y;
+		throw "Point.operator[] : bad index";
+	}
+
 	Point & Point::operator += (const Point & v)
 	{
 		x += v.x;

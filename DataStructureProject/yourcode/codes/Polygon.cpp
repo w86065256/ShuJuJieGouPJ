@@ -57,6 +57,25 @@ namespace yyy
 	{
 		v.push_back(a);
 	}
+	
+	bool Polygon::cross(const Box & b)
+	{
+		Polygon & p = *this;
+		for(int i = 0;i < size();i++)
+		{
+			for(int u = 0;u <= 1;u++)
+			{
+				if(	b[u^1][0] <= p[i  ][u^1] && p[i  ][u^1] <= b[u^1][1] && 
+					b[u^2][0] <= p[i+1][u^1] && p[i+1][u^1] <= b[u^1][1] )
+				{
+					if( (p[i][u] - b[u][0]) * (p[i+1][u] - b[u][0]) < 0 || 
+						(p[i][u] - b[u][1]) * (p[i+1][u] - b[u][1]) < 0 )
+						return true;
+				}
+			}
+		}
+		return false;
+	}
 }
 
 std::ostream & operator << (std::ostream & cout , const yyy::Polygon & a)
