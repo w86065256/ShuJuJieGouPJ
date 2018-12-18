@@ -2,26 +2,26 @@
 
 namespace yyy
 {
-	Polygon::Polygon(int number)
+	Polygon::Polygon(int id)
 	{
-		num = number;
+		this->id = id;
 	}
 
-	Polygon::Polygon(std::vector<Point> vec , int number)
+	Polygon::Polygon(const std::vector<Point> & vec , int id)
 	{
 		v = vec;
-		num = number;
+		this->id = id;
 	}
-	Polygon::Polygon(std::vector< std::pair<double,double> > vec , int number)
+	Polygon::Polygon(std::vector< std::pair<double,double> > vec , int id)
 	{
 		for(int i = 0;i < vec.size();i++)
 			v.push_back( Point(vec[i]) );
-		num = number;
+		this->id = id;
 	}
 
-	bool Polygon::inside(const Box & b)
+	bool Polygon::inside(const Box & b)const
 	{
-		for(auto & p: *this)
+		for(const auto & p: *this)
 		{
 			if(!p.inside(b))
 				return false;
@@ -29,9 +29,13 @@ namespace yyy
 		return true;
 	}
 
-	bool Polygon::inside_or_cross(const Box & b)
+	bool Polygon::inside_or_cross(const Box & b)const
 	{
 		return inside(b) or cross(b);
+	}
+	bool Polygon::cross_or_inside(const Box & b)const
+	{
+		return inside_or_cross(b);
 	}
 
 	Polygon::iterator Polygon::begin()
@@ -76,9 +80,9 @@ namespace yyy
 		v.push_back(a);
 	}
 	
-	bool Polygon::cross(const Box & b)
+	bool Polygon::cross(const Box & b)const
 	{
-		Polygon & p = *this;
+		const Polygon & p = *this;
 		for(int i = 0;i < size();i++)
 		{
 			for(int u = 0;u <= 1;u++)

@@ -14,10 +14,10 @@ namespace yyy
 	{
 		double x;
 		double y;
-		int num;
+		int id;
 
-		Point(double x = 0,double y = 0 , int number = -1);
-		Point( std::pair<double,double> p , int number = -1);
+		Point(double x = 0,double y = 0 , int id = -1);
+		Point( std::pair<double,double> p , int id = -1);
 		
 		double & operator [](int k);
 		double operator [](int k)const;
@@ -29,6 +29,8 @@ namespace yyy
 
 		bool inside(const Box & b)const;
 		bool inside(const Polygon & b , int max_test = 3)const;
+
+		bool is_same(const Point & p)const;	//编号相同
 	};
 
 	Point operator + (const Point & a,const Point & b);
@@ -43,6 +45,7 @@ namespace yyy
 	bool operator >= (const Point & a,const Point & b);
 	bool operator == (const Point & a,const Point & b);
 	bool operator != (const Point & a,const Point & b);
+	bool is_same(const Point & a,const Point & b);	//编号相同
 
 	typedef Point Vector;
 }

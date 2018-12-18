@@ -5,5 +5,6 @@
 #include "Polygon.h"
 #include "Point.h"
 #include "methods.h"
+#include "KDTree.h"
 
 #endif //_YYY_ALL_H_

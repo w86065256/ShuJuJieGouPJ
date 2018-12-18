@@ -18,6 +18,9 @@ namespace yyy
 		{
 			for(int j = 0;j <= 1;j++)
 			{
+				_v[i][j] = b._v[i][j];
+			}
+		}
 		return *this;
 	}
 

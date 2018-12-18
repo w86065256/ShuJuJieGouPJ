@@ -1,22 +1,31 @@
 #include "universe.h"
 #include <map>
 
-static std::map<int,Polygon> polys;
-static std::map<int,Point> points;
+static std::map< int , Point > points;
+static KDTNode * root = 0;
+static std::map< int , Polygon > polys;
 
 
-void SetEnvironment() {
-}
+void SetEnvironment() 
+{}
 
-void AddPoint(int id, double x, double y) {
+void AddPoint(int id, double x, double y) 
+{
+	if(root == 0)
+		root = new KDTNode( Point(x,y,id) );
+	else root->add( Point(x,y,id) );
+
 	points[id] = Point(x,y,id);
 }
 
-void DeletePoint(int id) {
+void DeletePoint(int id) 
+{
+	root->del( points[id] );
 	points.erase(id);
 }
 
-std::vector<int> QueryPoint(double x, double y) {
+std::vector<int> QueryPoint(double x, double y) 
+{
 	std::vector<int> res;
 	Point p(x,y);
 	for(auto & x : polys)
@@ -27,36 +36,28 @@ std::vector<int> QueryPoint(double x, double y) {
 	return res;
 }
 
-Polygon * make_poly(int n, std::vector<std::pair<double, double>> &polygon , int id = 0)
-{//记得delete p
-	Polygon * p = new Polygon(id);
-	for(int i = 0;i < n;i++)
-		p->v.push_back( Point(polygon[i].first , polygon[i].second) );
-	return p;
+void AddPolygon(int id, int n, std::vector<std::pair<double, double>> &polygon) 
+{
+	polys[id] = Polygon(polygon , id);
 }
 
-void AddPolygon(int id, int n, std::vector<std::pair<double, double>> &polygon) {
-	auto p = make_poly(n , polygon , id);
-	polys[id] = *p;
-	delete p;
-}
-
-void DeletePolygon(int id) {
+void DeletePolygon(int id) 
+{
 	polys.erase(id);
 }
 
-std::vector<int> QueryPolygon(int n, std::vector<std::pair<double, double>> &polygon) {
+std::vector<int> QueryPolygon(int n, std::vector<std::pair<double, double>> &polygon) 
+{
 	std::vector<int> res;
-	
-	Polygon * pp = make_poly(n,polygon);
 
-	for(auto & x : points)
-	{
-		if(x.second.inside(*pp))
-			res.push_back(x.first);
-	}
+	std::vector<Point> res_poi;
 
-	delete pp;
+	Polygon pol(polygon);
+
+	ask_poly(root , pol , res_poi);
+
+	for(int i = 0;i < res_poi.size();i++)
+		res.push_back(res_poi[i].id);
 
 	return res;
 }

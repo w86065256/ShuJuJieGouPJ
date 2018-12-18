@@ -16,15 +16,16 @@ namespace yyy
 		typedef std::vector<Point>::const_iterator const_iterator;
 
 		std::vector<Point> v;
-		int num;
+		int id;
 
-		Polygon(int number = -1);
-		Polygon(std::vector<Point> vec , int number = -1);
-		Polygon(std::vector< std::pair<double,double> > vec , int number = -1);
+		Polygon(int id = -1);
+		Polygon(const std::vector<Point> & vec , int id = -1);
+		Polygon(std::vector< std::pair<double,double> > vec , int id = -1);
 
-		bool inside(const Box & b);
-		bool cross(const Box & b);	//相交
-		bool inside_or_cross(const Box & b);	//有重合部分
+		bool inside(const Box & b)const;
+		bool cross(const Box & b)const;	//相交
+		bool inside_or_cross(const Box & b)const;	//有重合部分
+		bool cross_or_inside(const Box & b)const;	//有重合部分
 
 		Point & operator [](int k);
 		const Point & operator [](int k)const;

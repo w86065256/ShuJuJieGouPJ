@@ -1,17 +1,24 @@
 #include <iostream>
 #include <map>
 #include <time.h>
+#include <vector>
 #include <stdlib.h>
 #include "Polygon.h"
 #include "Point.h"
 #include "Box.h"
 #include "KDTree.h"
+#include "Poly_Point.h"
+#include "use_rtree.h"
 
 using namespace yyy;
 
 
 #define MAKE_S(_) const char * _test_s = _;int _test_cnt_ = 0
 #define ASSERT(_) {_test_cnt_++;if(!(_)) throw std::pair<const char *,int>(_test_s , _test_cnt_);}
+
+template <typename T>
+bool ask_inside(const std::vector<T> & v , const T & a);
+bool ask_inside(const std::vector<Point> & v , int id);
 
 void test_Point();
 void test_Polygon();
@@ -20,6 +27,10 @@ void test_insied_box();
 void test_insied_poly();
 void test_kdt_node_make();
 void test_polygon_cross_box();
+void test_ask_poly();
+void test_ask_poly_point();
+void test_add_poly_point();
+void test_add_rtree();
 
 int main()
 {
@@ -34,6 +45,10 @@ int main()
 		test_insied_poly();
 		test_kdt_node_make();
 		test_polygon_cross_box();
+		test_ask_poly();
+		test_ask_poly_point();
+		test_add_poly_point();
+		test_add_rtree();
 	}
 	catch (std::pair<const char * , int> s)
 	{
@@ -50,6 +65,195 @@ int main()
 
 
 	return 0;
+}
+
+void test_add_rtree()
+{
+	MAKE_S("test_add_rtree failed");
+
+	std::vector<Point> poly_point = 
+	{
+		Point(0,0),
+		Point(3,1),
+		Point(2,2),
+		Point(4,3),
+		Point(2,4),
+		Point(-1,4),
+		Point(-2,3),
+	};
+
+	Polygon poly(poly_point);
+
+	add_poly(poly);
+
+}
+
+void test_add_poly_point()
+{
+	MAKE_S("test add poly point failed");
+
+	std::vector<Point> ps = 
+	{
+		Point(1,2),
+		Point(2,3),
+		Point(4,5),
+		Point(6,7),
+		Point(8,9),
+	};
+
+	auto root = new KDTNode();
+
+	root->add_poly(ps);
+
+	ASSERT(root -> size == 6);
+	root->del(ps[0]);
+	ASSERT(root -> size == 5);
+
+}
+
+void test_ask_poly_point()
+{
+	MAKE_S("test_ask_poly_point fail");
+
+	Poly_Point ps[4] = 
+	{
+		Poly_Point(1,2,1 , 0),
+		Poly_Point(2,3,2 , 1),
+		Poly_Point(-1,3,3 , 2),
+		Poly_Point(-2,1,4 , 3),
+	};
+
+	Poly_Point pss[4] = 
+	{
+		Poly_Point(1,2,1 , 0),
+		Poly_Point(2,3,2 , 1),
+		Poly_Point(-1,3,3 , 2),
+		Poly_Point(-2,1,4 , 3),
+	};
+
+	std::vector<Point> poly_point = 
+	{
+		Point(0,0),
+		Point(3,1),
+		Point(2,2),
+		Point(4,3),
+		Point(2,4),
+		Point(-1,4),
+		Point(-2,3),
+	};
+
+	Polygon poly (poly_point);
+
+	ASSERT(ps[0].inside(poly));
+	ASSERT(ps[1].inside(poly));
+	ASSERT(ps[2].inside(poly));
+	ASSERT(!ps[3].inside(poly));
+
+	KDTNode * root = make_kdt(pss , pss + 4);
+
+	std::vector<Point> res;
+	ask_poly(root , poly , res);
+
+	ASSERT(res.size() == 3);
+
+	ASSERT(  ask_inside<Point>( res , ps[0] ) );
+	ASSERT(  ask_inside<Point>( res , ps[1] ) );
+	ASSERT(  ask_inside<Point>( res , ps[2] ) );
+	ASSERT( !ask_inside<Point>( res , ps[3] ) );
+
+	delete root;
+}
+
+template <typename T>
+bool ask_inside(const std::vector<T> & v , const T & a)
+{
+	for(int i = 0;i < v.size();i++)
+	{
+		if(v[i].is_same(a))
+			return true;
+	}
+	return false;
+}
+
+bool ask_inside(const std::vector<Point> & v , int id)
+{
+	for(int i = 0;i < v.size();i++)
+	{
+		if(v[i].id == id)
+			return true;
+	}
+	return false;
+}
+
+void test_ask_poly()
+{
+	MAKE_S("test_ask_poly fail");
+
+	Point ps[4] = 
+	{
+		Point(1,2,1),
+		Point(2,3,2),
+		Point(-1,3,3),
+		Point(-2,1,4),
+	};
+	Point pss[4] = 
+	{
+		Point(1,2,1),
+		Point(2,3,2),
+		Point(-1,3,3),
+		Point(-2,1,4),
+	};
+
+	std::vector<Point> poly_point = 
+	{
+		Point(0,0),
+		Point(3,1),
+		Point(2,2),
+		Point(4,3),
+		Point(2,4),
+		Point(-1,4),
+		Point(-2,3),
+	};
+
+	Polygon poly (poly_point);
+
+	ASSERT(ps[0].inside(poly));
+	ASSERT(ps[1].inside(poly));
+	ASSERT(ps[2].inside(poly));
+	ASSERT(!ps[3].inside(poly));
+
+	KDTNode * root = make_kdt(pss , pss + 4);
+
+	std::vector<Point> res;
+	ask_poly(root , poly , res);
+
+	ASSERT(res.size() == 3);
+	ASSERT( ask_inside( res , ps[0] ) );
+	ASSERT( ask_inside( res , ps[1] ) );
+	ASSERT( ask_inside( res , ps[2] ) );
+	ASSERT( !ask_inside( res , ps[3] ) );
+
+	Point p1(0,0,12);
+	root->add(p1);
+	auto y = ask_poly(root , poly);
+
+	ASSERT(y.size() == 3);
+	ASSERT( ask_inside( y , ps[0] ) );
+	ASSERT( ask_inside( y , ps[1] ) );
+	ASSERT( ask_inside( y , ps[2] ) );
+	ASSERT( !ask_inside( y , ps[3] ) );
+	ASSERT( !ask_inside( y , p1 ) );
+
+	root->del(ps[0]);
+	y = ask_poly(root , poly);
+
+	ASSERT(y.size() == 2);
+	ASSERT( ask_inside( y , ps[1] ) );
+	ASSERT( ask_inside( y , ps[2] ) );
+	ASSERT( !ask_inside( y , ps[3] ) );
+	ASSERT( !ask_inside( y , p1 ) );
+
+	delete root;
 }
 
 void test_polygon_cross_box()
@@ -76,30 +280,77 @@ void test_kdt_node_make()
 {
 	MAKE_S("test_kdt_node_make fail");
 
-	Point ps[8] = {
-		Point(3,5),
-		Point(6,3),
-		Point(2,1),
-		Point(6,1),
-		Point(1,5),
-		Point(1,7),
-		Point(5,2),
-		Point(4,3),
-	};
-	KDTNode * root = 0;
-	root = make_kdt(ps , ps + 8 , 0);
-	//printf("%f\n",(float)(root->box.top));
-	ASSERT(root->box == MAX_BOX);
-	ASSERT(root->size == 8);
-	ASSERT(root->p == Point(4,3));
-	ASSERT(root->lef->box.top == root->box.top);
-	ASSERT(root->lef->box.lef == root->box.lef);
-	ASSERT(root->lef->box.rig != root->box.rig);
-	ASSERT(root->rig->box.bot == root->box.bot);
-	ASSERT(root->rig->box.rig == root->box.rig);
-	ASSERT(root->rig->box.lef != root->box.lef);
+	{
+		Point ps[8] = {
+			Point(3,5),
+			Point(6,3),
+			Point(2,1),
+			Point(6,1),
+			Point(1,5),
+			Point(1,7),
+			Point(5,2),
+			Point(4,3),
+		};
+		KDTNode * root = 0;
+		root = make_kdt(ps , ps + 8 , 0);
+		//printf("%f\n",(float)(root->box.top));
+		ASSERT(root->box == MAX_BOX);
+		ASSERT(root->size == 8);
+		ASSERT(root->poi == Point(4,3));
+		ASSERT(root->lef->box.top == root->box.top);
+		ASSERT(root->lef->box.lef == root->box.lef);
+		ASSERT(root->lef->box.rig != root->box.rig);
+		ASSERT(root->rig->box.bot == root->box.bot);
+		ASSERT(root->rig->box.rig == root->box.rig);
+		ASSERT(root->rig->box.lef != root->box.lef);
+		delete root;
+	}
 
-	delete root;
+	{
+		KDTNode * u = new KDTNode();
+		KDTNode * y = new KDTNode();
+
+		y->son(0) = u;
+		ASSERT(y->lef == u);
+		ASSERT(y->rig == 0);
+		delete y;
+	}
+
+	{
+		Point ps[8] = {
+			Point(3,5),
+			Point(6,3 , 9),
+			Point(2,1 , 6),
+			Point(6,1 , 12),
+			Point(1,5),
+			Point(1,7),
+			Point(5,2),
+			Point(4,3),
+		};
+
+		KDTNode * root = new KDTNode(0,ps[0],MAX_BOX);
+		for(int i = 1;i <= 7;i++)
+			root->add(ps[i]);
+
+		ASSERT(root->box == MAX_BOX);
+		ASSERT(root->size == 8);
+		ASSERT(root->poi == Point(3,5));
+		ASSERT(root->lef->box.top == root->box.top);
+		ASSERT(root->lef->box.lef == root->box.lef);
+		ASSERT(root->lef->box.rig != root->box.rig);
+		ASSERT(root->rig->box.bot == root->box.bot);
+		ASSERT(root->rig->box.rig == root->box.rig);
+		ASSERT(root->rig->box.lef != root->box.lef);
+
+		root->del(ps[1]);
+		ASSERT(root->size == 7)
+
+		root->del(ps[2]);
+		ASSERT(root->size == 6)
+
+		delete root;
+	}
+
 }
 
 void test_insied_poly()
@@ -143,6 +394,28 @@ void test_insied_poly()
 		ASSERT( !Point(0.37 , 2.78).inside(y) );
 		ASSERT( !Point(0.00 , 0.00).inside(y) );
 		ASSERT( !Point(-1.26 , -0.67).inside(y) );
+	}
+	{
+		double xys[] = 
+		{
+			2,3,
+			3,1,
+			-4,-2,
+			-1,3,
+		};
+
+		Polygon y;
+		for(int i = 0;i < sizeof(xys) / sizeof(double);i += 2)
+			y.push_back( Point(xys[i] , xys[i+1] ) );
+
+		ASSERT( Point(2,1).inside(y) );
+		ASSERT( Point(-1,1).inside(y) );
+
+		ASSERT( !Point(1,3).inside(y) );
+		ASSERT( !Point(3,-2).inside(y) );
+		ASSERT( !Point(-4,2).inside(y) );
+		ASSERT( !Point(2,3).inside(y) );
+
 	}
 }
 
