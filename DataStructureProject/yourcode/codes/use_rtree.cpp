@@ -6,7 +6,7 @@
 Myrtree tree1;
 Myrtree tree2;
 
-void add_poly1(const Polygon & poly)
+void add_poly_1(const Polygon & poly)
 {
 	Box box(-INF , INF , INF , -INF);
 	for(int i = 0;i < poly.size();i++)
@@ -17,19 +17,22 @@ void add_poly1(const Polygon & poly)
 		box.rig = std::max(box.rig , poly[i].x);
 	}
 
-	int min[2] = {box.lef , box.bot};
-	int max[2] = {box.rig , box.top};
-	tree1.add(min , max , poly.id);
+	double min[2] = {box.lef , box.bot};
+	double max[2] = {box.rig , box.top};
+	tree1.Insert(min , max , poly.id);
 }
 
-void add_poly2(const Polygon & poly)
+void add_poly_2(const Polygon & poly)
 {}
 
 void add_poly(const Polygon & poly)
 {
 	if(poly.size() <= alpha)
-		add_poly_1();
-	add_poly_2();
+		add_poly_1(poly);
+	else add_poly_2(poly);
 }
 
-void ask_point()
+void ask_point_1(const Point & poi , std::vector<int> & vec)
+{
+
+}

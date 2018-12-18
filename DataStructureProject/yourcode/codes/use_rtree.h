@@ -13,18 +13,23 @@
 #ifndef _YYY_USE_RTREE_H_
 #define _YYY_USE_RTREE_H_
 
+#include <vector>
 #include "cloned/RTree.h"
 #include "Polygon.h"
+#include "Point.h"
 
-typedef Rtree<double , int , 2> Myrtree;
+using namespace yyy;
+
+typedef RTree<int , double , 2> Myrtree;
 
 extern Myrtree tree1;
 extern Myrtree tree2;
 
 const int alpha = 20;
 
-void add_poly1(const Polygon & poly);
-void add_poly2(const Polygon & poly);
+void ask_point_1(const Point & poi , std::vector<int> & vec);
+void add_poly_1(const Polygon & poly);
+void add_poly_2(const Polygon & poly);
 void add_poly(const Polygon & poly);
 
 
