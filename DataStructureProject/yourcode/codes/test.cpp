@@ -3,6 +3,7 @@
 #include <time.h>
 #include <vector>
 #include <stdlib.h>
+#include <algorithm>
 #include "Polygon.h"
 #include "Point.h"
 #include "Box.h"
@@ -19,6 +20,19 @@ using namespace yyy;
 template <typename T>
 bool ask_inside(const std::vector<T> & v , const T & a);
 bool ask_inside(const std::vector<Point> & v , int id);
+template <typename T>
+bool vector_equ(const std::vector<T> & a1 , const std::vector<T> & a2);
+
+template <>
+bool ask_inside(const std::vector<Point> & v , const Point & a)
+{
+	for(int i = 0;i < v.size();i++)
+	{
+		if(v[i].is_same(a))
+			return true;
+	}
+	return false;
+}
 
 void test_Point();
 void test_Polygon();
@@ -31,6 +45,8 @@ void test_ask_poly();
 void test_ask_poly_point();
 void test_add_poly_point();
 void test_add_rtree();
+void test_ask_point_1();
+void test_ask_point_2();
 
 int main()
 {
@@ -49,6 +65,8 @@ int main()
 		test_ask_poly_point();
 		test_add_poly_point();
 		test_add_rtree();
+		test_ask_point_1();
+		test_ask_point_2();
 	}
 	catch (std::pair<const char * , int> s)
 	{
@@ -67,6 +85,318 @@ int main()
 	return 0;
 }
 
+
+void test_ask_point_2()
+{
+	MAKE_S("test_ask_point_2 failed");
+	{
+		std::vector< Point > pois_1 = 
+		{
+			Point(-1,-1),
+			Point(-3,2),
+			Point(-2,3),
+			Point(0,3),
+			Point(-1,1),
+			Point(2,1),
+		};
+		Polygon poly_1(pois_1 , 1);
+		add_poly(poly_1 , 0);
+	}
+
+	{
+		std::vector< Point > pois_2 = 
+		{
+			Point(-1,-1),
+			Point(-3,0),
+			Point(-1,4),
+			Point(0,4),
+			Point(1,2),
+			Point(2,3),
+			Point(3,2),
+			Point(2,0),
+		};
+		Polygon poly_2(pois_2 , 2);
+		add_poly(poly_2 , 0);
+	}
+
+	{
+		std::vector< Point > pois_3 = 
+		{
+			Point(-1,0),
+			Point(1,4),
+			Point(2,2),
+		};
+		Polygon poly_3(pois_3 , 3);
+		add_poly(poly_3 , 0);
+	}
+
+	{
+		std::vector< Point > pois = 
+		{
+			Point(233,445),
+			Point(768,987),
+			Point(123,677),
+		};
+		Polygon poly(pois , 4);
+		add_poly(poly , 0);
+	}	
+	{
+		std::vector< Point > pois = 
+		{
+			Point(11122,4345),
+			Point(76328,6545),
+			Point(1223,6766),
+		};
+		Polygon poly(pois , 5);
+		add_poly(poly , 0);
+	}	
+	{
+		std::vector< Point > pois = 
+		{
+			Point(879,879),
+			Point(345,4567),
+			Point(323,3425),
+		};
+		Polygon poly(pois , 6);
+		add_poly(poly , 0);
+	}	
+	{
+		std::vector< Point > pois = 
+		{
+			Point(1879,546879),
+			Point(23345,454567),
+			Point(432323,63425),
+		};
+		Polygon poly(pois , 6);
+		add_poly(poly , 0);
+	}
+
+	Point ps[8] = 
+	{
+		Point(-2,1),
+		Point(0,1),
+		Point(-1,-1),
+		Point(2,2),
+		Point(-1,2),
+		Point(1,3),
+		Point(-1,0),
+		Point(-2.5 , 2),
+	};
+
+	{
+		std::vector<int> vecs[8];
+
+		ask_point(ps[0] , vecs[0]);
+		ask_point(ps[1] , vecs[1]);
+		ask_point(ps[2] , vecs[2]);
+		ask_point(ps[3] , vecs[3]);
+		ask_point(ps[4] , vecs[4]);
+		ask_point(ps[5] , vecs[5]);
+		ask_point(ps[6] , vecs[6]);
+		ask_point(ps[7] , vecs[7]);
+
+		ASSERT( vector_equ(vecs[0] , std::vector<int>({1,2,}) ) );
+
+		ASSERT( vector_equ(vecs[1] , std::vector<int>({2,3,}) ) );
+		ASSERT( vector_equ(vecs[2] , std::vector<int>({}) ) );
+		ASSERT( vector_equ(vecs[3] , std::vector<int>({2,}) ) );
+		ASSERT( vector_equ(vecs[4] , std::vector<int>({1,2,}) ) );
+		ASSERT( vector_equ(vecs[5] , std::vector<int>({3,}) ) );
+		ASSERT( vector_equ(vecs[6] , std::vector<int>({1,2,}) ) );
+		ASSERT( vector_equ(vecs[7] , std::vector<int>({1,}) ) );
+	}
+
+	del_poly(1 , 0);
+
+	{
+		std::vector<int> vecs[8];
+
+		ask_point(ps[0] , vecs[0]);
+		ask_point(ps[1] , vecs[1]);
+		ask_point(ps[2] , vecs[2]);
+		ask_point(ps[3] , vecs[3]);
+		ask_point(ps[4] , vecs[4]);
+		ask_point(ps[5] , vecs[5]);
+		ask_point(ps[6] , vecs[6]);
+		ask_point(ps[7] , vecs[7]);
+
+		ASSERT( vector_equ(vecs[0] , std::vector<int>({2,}) ) );
+
+		ASSERT( vector_equ(vecs[1] , std::vector<int>({2,3,}) ) );
+		ASSERT( vector_equ(vecs[2] , std::vector<int>({}) ) );
+		ASSERT( vector_equ(vecs[3] , std::vector<int>({2,}) ) );
+		ASSERT( vector_equ(vecs[4] , std::vector<int>({2,}) ) );
+		ASSERT( vector_equ(vecs[5] , std::vector<int>({3,}) ) );
+		ASSERT( vector_equ(vecs[6] , std::vector<int>({2,}) ) );
+		ASSERT( vector_equ(vecs[7] , std::vector<int>({}) ) );
+	}
+
+
+	tree1.RemoveAll();
+	tree2.RemoveAll();
+}
+
+void test_ask_point_1()
+{
+	MAKE_S("test_ask_point_1 failed");
+	{
+		std::vector< Point > pois_1 = 
+		{
+			Point(-1,-1),
+			Point(-3,2),
+			Point(-2,3),
+			Point(0,3),
+			Point(-1,1),
+			Point(2,1),
+		};
+		Polygon poly_1(pois_1 , 1);
+		add_poly(poly_1);
+	}
+
+	{
+		std::vector< Point > pois_2 = 
+		{
+			Point(-1,-1),
+			Point(-3,0),
+			Point(-1,4),
+			Point(0,4),
+			Point(1,2),
+			Point(2,3),
+			Point(3,2),
+			Point(2,0),
+		};
+		Polygon poly_2(pois_2 , 2);
+		add_poly(poly_2);
+	}
+
+	{
+		std::vector< Point > pois_3 = 
+		{
+			Point(-1,0),
+			Point(1,4),
+			Point(2,2),
+		};
+		Polygon poly_3(pois_3 , 3);
+		add_poly(poly_3);
+	}
+
+	{
+		std::vector< Point > pois = 
+		{
+			Point(233,445),
+			Point(768,987),
+			Point(123,677),
+		};
+		Polygon poly(pois , 4);
+		add_poly(poly);
+	}	
+	{
+		std::vector< Point > pois = 
+		{
+			Point(11122,4345),
+			Point(76328,6545),
+			Point(1223,6766),
+		};
+		Polygon poly(pois , 5);
+		add_poly(poly);
+	}	
+	{
+		std::vector< Point > pois = 
+		{
+			Point(879,879),
+			Point(345,4567),
+			Point(323,3425),
+		};
+		Polygon poly(pois , 6);
+		add_poly(poly);
+	}	
+	{
+		std::vector< Point > pois = 
+		{
+			Point(1879,546879),
+			Point(23345,454567),
+			Point(432323,63425),
+		};
+		Polygon poly(pois , 6);
+		add_poly(poly);
+	}
+
+	Point ps[8] = 
+	{
+		Point(-2,1),
+		Point(0,1),
+		Point(-1,-1),
+		Point(2,2),
+		Point(-1,2),
+		Point(1,3),
+		Point(-1,0),
+		Point(-2.5 , 2),
+	};
+
+	{
+		std::vector<int> vecs[8];
+
+		ask_point_1(ps[0] , vecs[0]);
+		ask_point_1(ps[1] , vecs[1]);
+		ask_point_1(ps[2] , vecs[2]);
+		ask_point_1(ps[3] , vecs[3]);
+		ask_point_1(ps[4] , vecs[4]);
+		ask_point_1(ps[5] , vecs[5]);
+		ask_point_1(ps[6] , vecs[6]);
+		ask_point_1(ps[7] , vecs[7]);
+
+		ASSERT( vector_equ(vecs[0] , std::vector<int>({1,2,}) ) );
+
+		ASSERT( vector_equ(vecs[1] , std::vector<int>({2,3,}) ) );
+		ASSERT( vector_equ(vecs[2] , std::vector<int>({}) ) );
+		ASSERT( vector_equ(vecs[3] , std::vector<int>({2,}) ) );
+		ASSERT( vector_equ(vecs[4] , std::vector<int>({1,2,}) ) );
+		ASSERT( vector_equ(vecs[5] , std::vector<int>({3,}) ) );
+		ASSERT( vector_equ(vecs[6] , std::vector<int>({1,2,}) ) );
+		ASSERT( vector_equ(vecs[7] , std::vector<int>({1,}) ) );
+	}
+
+	del_poly(2);
+
+	{
+		std::vector<int> vecs[8];
+
+		ask_point_1(ps[0] , vecs[0]);
+		ask_point_1(ps[1] , vecs[1]);
+		ask_point_1(ps[2] , vecs[2]);
+		ask_point_1(ps[3] , vecs[3]);
+		ask_point_1(ps[4] , vecs[4]);
+		ask_point_1(ps[5] , vecs[5]);
+		ask_point_1(ps[6] , vecs[6]);
+		ask_point_1(ps[7] , vecs[7]);
+
+		ASSERT( vector_equ(vecs[0] , std::vector<int>({1,}) ) );
+
+		ASSERT( vector_equ(vecs[1] , std::vector<int>({3,}) ) );
+		ASSERT( vector_equ(vecs[2] , std::vector<int>({}) ) );
+		ASSERT( vector_equ(vecs[3] , std::vector<int>({}) ) );
+		ASSERT( vector_equ(vecs[4] , std::vector<int>({1,}) ) );
+		ASSERT( vector_equ(vecs[5] , std::vector<int>({3,}) ) );
+		ASSERT( vector_equ(vecs[6] , std::vector<int>({1,}) ) );
+		ASSERT( vector_equ(vecs[7] , std::vector<int>({1,}) ) );
+	}
+
+	tree1.RemoveAll();
+	tree2.RemoveAll();
+}
+
+template <typename T>
+bool vector_equ(const std::vector<T> & a1 , const std::vector<T> & a2)
+{
+	if(a1.size() != a2.size())
+		return false;
+	for(int i = 0;i < a1.size();i++)
+	{
+		if(!ask_inside(a2 , a1[i]))
+			return false;
+	}
+	return true;
+}
 void test_add_rtree()
 {
 	MAKE_S("test_add_rtree failed");
@@ -86,6 +416,8 @@ void test_add_rtree()
 
 	add_poly(poly);
 
+	tree1.RemoveAll();
+	tree2.RemoveAll();
 }
 
 void test_add_poly_point()
@@ -169,7 +501,7 @@ bool ask_inside(const std::vector<T> & v , const T & a)
 {
 	for(int i = 0;i < v.size();i++)
 	{
-		if(v[i].is_same(a))
+		if(v[i] == a)
 			return true;
 	}
 	return false;

@@ -14,6 +14,7 @@ need_os = \
 ./yourcode/codes/methods.o \
 ./yourcode/codes/KDTree.o \
 ./yourcode/codes/Poly_Point.o \
+./yourcode/codes/use_rtree.o \
 ./yourcode/universe.o \
 
 

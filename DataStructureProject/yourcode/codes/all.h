@@ -6,5 +6,6 @@
 #include "Point.h"
 #include "methods.h"
 #include "KDTree.h"
+#include "use_rtree.h"
 
 #endif //_YYY_ALL_H_

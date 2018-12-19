@@ -3,8 +3,6 @@
 
 static std::map< int , Point > points;
 static KDTNode * root = 0;
-static std::map< int , Polygon > polys;
-
 
 void SetEnvironment() 
 {}
@@ -27,23 +25,19 @@ void DeletePoint(int id)
 std::vector<int> QueryPoint(double x, double y) 
 {
 	std::vector<int> res;
-	Point p(x,y);
-	for(auto & x : polys)
-	{
-		if(p.inside(x.second))
-			res.push_back(x.first);
-	}
+	ask_point(Point(x,y) , res);
 	return res;
 }
 
 void AddPolygon(int id, int n, std::vector<std::pair<double, double>> &polygon) 
 {
-	polys[id] = Polygon(polygon , id);
+	Polygon poly(polygon , id);
+	add_poly(poly);
 }
 
 void DeletePolygon(int id) 
 {
-	polys.erase(id);
+	del_poly(id);
 }
 
 std::vector<int> QueryPolygon(int n, std::vector<std::pair<double, double>> &polygon) 
