@@ -9,7 +9,12 @@ test_files = [
 	["./data/toydata/test_case_6.in" , "./data/toydata/test_case_6.ans"] ,
 ]
 
-os.system("make")
+make_res = os.system("make")
+
+if make_res:
+	print ("\n*** BAD !! ***\n Compile Error \n")
+	quit()
+
 
 for in_path , out_path in test_files : 
 	os.system("copy %s test.in /Y" % (in_path.replace("/" , "\\")))
