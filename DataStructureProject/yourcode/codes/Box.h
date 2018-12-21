@@ -30,6 +30,8 @@ namespace yyy
 		const double * operator [](int k)const;
 
 		Box cut(int k1,int k2,double v)const;
+
+		bool inside(const Box & b)const;
 	};
 
 	bool operator == (const Box & a,const Box & b);

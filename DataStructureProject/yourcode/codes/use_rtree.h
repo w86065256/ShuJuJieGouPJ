@@ -29,11 +29,12 @@ typedef std::pair<int ,int> Pii;
 
 extern RTree< int , double , 2> tree1;
 extern RTree< Pii , double , 2> tree2;
+//extern RTree< int , double , 2> tree3;
 
 //extern std::map<int , Polygon> polys_2; //从 id 到 Polygon 的映射 ，只对大多边形有效，故是O(n)的
 extern std::map<int , Polygon> polys; //从 id 到 Polygon 的映射
 
-const int alpha = 20;
+const int alpha = 10000;
 const int test_time = 3;
 
 void ask_point_1(const Point & poi , std::vector<int> & vec);
@@ -45,6 +46,10 @@ void ask_point(const Point & poi , std::vector<int> & vec);
 void del_poly_1(const Polygon & poly);
 void del_poly_2(const Polygon & poly);
 void del_poly(int id , int alp = -1);
+
+//void add_point(const Point & poi);
+//void del_point(int id);
+//void ask_poly(const Polygon & poly);
 
 struct Callback_1
 {

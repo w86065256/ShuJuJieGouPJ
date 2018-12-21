@@ -1,32 +1,58 @@
 #include <algorithm>
 #include <stdexcept>
+#include <map>
+#include <cstdlib>
 #include "KDTree.h"
 #include "methods.h"
 #include "Poly_Point.h"
 
 namespace yyy
 {
-	KDTNode::KDTNode(const Point & poi,int dir,const Box & box,KDTNode * lef, KDTNode * rig)
+	KDTNode::KDTNode
+	(
+		const Point & poi, 
+		int dir ,
+		const Box & box ,
+		KDTNode * lef , 
+		KDTNode * rig , 
+		bool deled , 
+		double alpha
+	)
 	{
 		this->poi = poi;
 		this->dir = dir;
 		this->box = box;
 		this->lef = lef;
 		this->rig = rig;
+		this->alpha = alpha;
 
-		size = 1;
-		deled = false;
+		size = not deled;
+		bad_size = deled;
+		height = not deled;
+		this->deled = deled;
 	}	
-	KDTNode::KDTNode(int dir,const Point & poi,const Box & box,KDTNode * lef, KDTNode * rig)
+	KDTNode::KDTNode	
+	(
+		int dir ,
+		const Point & poi, 
+		const Box & box ,
+		KDTNode * lef , 
+		KDTNode * rig , 
+		bool deled ,
+		double alpha
+	)
 	{
 		this->poi = poi;
 		this->dir = dir;
 		this->box = box;
 		this->lef = lef;
 		this->rig = rig;
+		this->alpha = alpha;
 
-		size = 1;
-		deled = false;
+		size = not deled;
+		bad_size = deled;
+		height = not deled;
+		this->deled = deled;
 	}
 
 	KDTNode::~KDTNode()
@@ -44,11 +70,31 @@ namespace yyy
 		return lef;
 	}
 
+	bool KDTNode::bad()
+	{
+		int lim = all_size() * alpha;
+		int lsiz = lef ? lef->all_size() : 0;
+		int rsiz = rig ? rig->all_size() : 0;
+
+		return lsiz > all_size() || rsiz > all_size();
+	}
+
 	void KDTNode::update()
 	{
 		size = !deled;
-		size += get_size(lef);
-		size += get_size(rig);
+		bad_size = deled;
+		height = 0;
+
+		for(int k = 0;k < 2;k++)
+		{
+			if(!son(k))
+				continue;
+			size += son(k)->size;
+			bad_size += son(k)->bad_size;
+			height = std::max(height , son(k)->height);
+		}
+
+		height ++;
 	}
 	
 	void KDTNode::del_self()
@@ -58,6 +104,9 @@ namespace yyy
 	}
 	void KDTNode::del(const Point & tar)
 	{
+		lef = check(lef);
+		rig = check(rig);
+
 		if(tar.is_same(poi))
 		{
 			del_self();
@@ -97,12 +146,34 @@ namespace yyy
 
 	void KDTNode::add(const Point & p)
 	{
+		lef = check(lef);
+		rig = check(rig);
+
+		int new_dir = dir ^ 1;
+
 		int k = p[dir] >= poi[dir];
 
 		if(!son(k))
 		{
-			Box new_box = box.cut(dir , k^1 , p[dir]);
-			son(k) = new KDTNode(dir , p , new_box);
+			Box old_box = box;
+			Box new_box = box.cut(dir , k^1 , poi[dir]);
+			
+			if(new_box.rig < new_box.lef)
+			{
+				printf("old_box : top : %.2f , lef : %.2f , bot : %.2f , rig :%.2f \n",
+					old_box.top , old_box.lef , old_box.bot , old_box.rig);
+				printf("new_box : top : %.2f , lef : %.2f , bot : %.2f , rig :%.2f \n",
+					new_box.top , new_box.lef , new_box.bot , new_box.rig);
+				printf("this_poi : %.2f , %.2f \n",
+					poi.x , poi.y);
+				printf("new_poi : %.2f , %.2f \n",
+					p.x , p.y);
+				printf("dir : %d \n",
+					dir);
+				exit(1);
+			}
+			
+			son(k) = new KDTNode(new_dir , p , new_box);
 		}
 		else
 			son(k)->add(p);
@@ -115,12 +186,29 @@ namespace yyy
 		if(d == 0)
 			return;
 		if(! poly.cross_or_inside(d->box) )
-			return;
+		{
+			if(d->poi.inside(poly))
+			{
+				printf("exception occured.\n");
+				printf("poi : %.2f , %.2f\n",d->poi[0] , d->poi[1]);
+				printf("box : top : %.2f , lef : %.2f , bot : %.2f , rig :%.2f \n",
+					d->box.top , d->box.lef , d->box.bot , d->box.rig);
+				printf("poly : \n");
+				for(int i = 0;i < poly.size();i++)
+				{
+					printf("\t>> %.2f , %.2f\n",poly[i][0] , poly[i][1]);
+				}
+
+				exit(1);
+			}
+			//return;
+		}
 		if( (!d->deled) && d->poi.inside(poly))
 			res.push_back(d->poi);
 		ask_poly(d->son(0) , poly , res);
 		ask_poly(d->son(1) , poly , res);
 	}
+
 	std::vector< Point > ask_poly(KDTNode * d , const Polygon & poly)
 	{
 		std::vector< Point > res;
@@ -134,5 +222,50 @@ namespace yyy
 		{
 			add( Poly_Point(poly[i] , poly.id , i) );
 		}
+	}
+
+	static void spash_kdt(KDTNode * root , Point lis[] , int & tot)
+	{
+		if(!root)
+			return ;
+		if(!root->deled)
+			lis[tot++] = root->poi;
+		spash_kdt(root->lef , lis , tot);
+		spash_kdt(root->rig , lis , tot);
+	}
+
+	KDTNode * rebuild(KDTNode * root)
+	{
+		KDTNode * res = 0;
+
+		if(root == 0 || root->size == 0)
+			return 0;
+		int dir = root->dir;
+		int size = root->size;
+		Box now_box = root->box;
+		Point * pois = new Point [root->size];
+
+		int _tot = 0;
+
+		spash_kdt(root , pois , _tot);
+
+		delete root;
+
+		res = make_kdt(pois , pois + size , dir , now_box);
+
+		return res;
+	}
+
+	KDTNode * check(KDTNode * d)
+	{
+		if(d && d->bad())
+			return rebuild(d);
+		return d;
+	}
+
+
+	int KDTNode::all_size()
+	{
+		return size + bad_size;
 	}
 } 

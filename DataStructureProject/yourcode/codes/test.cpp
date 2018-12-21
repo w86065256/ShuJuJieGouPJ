@@ -47,6 +47,7 @@ void test_add_poly_point();
 void test_add_rtree();
 void test_ask_point_1();
 void test_ask_point_2();
+void test_kdt_rebuild();
 
 int main()
 {
@@ -59,7 +60,6 @@ int main()
 		test_box();
 		test_insied_box();
 		test_insied_poly();
-		test_kdt_node_make();
 		test_polygon_cross_box();
 		test_ask_poly();
 		test_ask_poly_point();
@@ -67,6 +67,8 @@ int main()
 		test_add_rtree();
 		test_ask_point_1();
 		test_ask_point_2();
+		test_kdt_rebuild();
+		test_kdt_node_make();
 	}
 	catch (std::pair<const char * , int> s)
 	{
@@ -85,6 +87,31 @@ int main()
 	return 0;
 }
 
+void test_kdt_rebuild()
+{
+	MAKE_S("test_kdt_rebuild failed");
+
+	std::vector<Point> ps = 
+	{
+		Point(1,2),
+		Point(2,3),
+		Point(4,5),
+		Point(6,7),
+		Point(8,9),
+	};
+
+	auto root = new KDTNode();
+
+	root->add_poly(ps);
+
+	ASSERT(root -> size == 6);
+	root->del(ps[0]);
+	ASSERT(root -> size == 5);
+
+	root = rebuild(root);
+	ASSERT(root -> size == 5);
+
+}
 
 void test_ask_point_2()
 {

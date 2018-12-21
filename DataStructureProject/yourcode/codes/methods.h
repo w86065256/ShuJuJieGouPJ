@@ -12,6 +12,7 @@ namespace yyy
 
 	const double EPS = 1e-9;
 	const double INF = 1e9;
+	const double DEFUALT_ALPHA = .75;
 
 	const Box MAX_BOX = Box(INF , -INF , -INF , INF);
 
@@ -58,8 +59,6 @@ namespace yyy
 		cmp(int focus = 0);
 		bool operator () (const Point & a,const Point & b);
 	};
-
-	int get_size(KDTNode * d);
 }
 
 #endif //_YYY_METHODS_H_

@@ -17,13 +17,17 @@ namespace yyy
 
 		std::vector<Point> v;
 		int id;
+		Box box;
 
 		Polygon(int id = -1);
 		Polygon(const std::vector<Point> & vec , int id = -1);
 		Polygon(std::vector< std::pair<double,double> > vec , int id = -1);
 
+		void update_box(const Point & poi);
+
 		bool inside(const Box & b)const;
 		bool cross(const Box & b)const;	//相交
+		bool maybe_contain(const Box & b)const;		//也许b在多边形内。
 		bool inside_or_cross(const Box & b)const;	//有重合部分
 		bool cross_or_inside(const Box & b)const;	//有重合部分
 

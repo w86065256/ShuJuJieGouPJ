@@ -16,11 +16,4 @@ namespace yyy
 			return a[focus] < b[focus];
 		return a[focus ^ 1] < b[focus ^ 1];
 	}
-
-	int get_size(KDTNode * d)
-	{
-		if(d)
-			return d->size;
-		return 0;
-	}
 }

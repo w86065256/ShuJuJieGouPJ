@@ -5,16 +5,18 @@ import matplotlib.pyplot as plt
 # black line -> added polygon
 # yellow line -> queried polygon
 
-map_x_min = -2
-map_x_max = 10
-map_y_min = -2
-map_y_max = 8
+in_path = "test.in"
+
+map_x_min = -500000
+map_x_max = 500000
+map_y_min = -500000
+map_y_max = 500000
 
 plt.axis([map_x_min, map_x_max, map_y_min, map_y_max])
 
 print("Hello World!")
 
-fin = open("../data/toydata/test_case_4.in", "r")
+fin = open(in_path, "r")
 fin.readline()
 
 while True:

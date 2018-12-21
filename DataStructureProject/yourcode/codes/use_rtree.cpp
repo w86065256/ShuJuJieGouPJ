@@ -4,20 +4,14 @@
 #include <algorithm>
 
 RTree< int , double , 2> tree1;
-RTree< Pii     , double , 2> tree2;
+RTree< Pii , double , 2> tree2;
+//RTree< int , double , 2> tree3;
 std::map<int , Polygon> polys;
+//std::map<int , points> points;
 
 void add_poly_1(const Polygon & poly)
 {
-	Box box(-INF , INF , INF , -INF);
-	for(int i = 0;i < poly.size();i++)
-	{
-		box.bot = std::min(box.bot , poly[i].y);
-		box.top = std::max(box.top , poly[i].y);
-		box.lef = std::min(box.lef , poly[i].x);
-		box.rig = std::max(box.rig , poly[i].x);
-	}
-
+	const Box & box = poly.box;
 	double min[2] = {box.lef , box.bot};
 	double max[2] = {box.rig , box.top};
 	tree1.Insert(min , max , poly.id);
@@ -99,15 +93,7 @@ void ask_point(const Point & poi , std::vector<int> & vec)
 
 void del_poly_1(const Polygon & poly)
 {
-	Box box(-INF , INF , INF , -INF);
-	for(int i = 0;i < poly.size();i++)
-	{
-		box.bot = std::min(box.bot , poly[i].y);
-		box.top = std::max(box.top , poly[i].y);
-		box.lef = std::min(box.lef , poly[i].x);
-		box.rig = std::max(box.rig , poly[i].x);
-	}
-
+	const Box & box = poly.box;
 	double min[2] = {box.lef , box.bot};
 	double max[2] = {box.rig , box.top};
 	tree1.Remove(min , max , poly.id);
@@ -136,3 +122,21 @@ void del_poly(int id , int alp)
 
 	polys.erase(id);
 }
+
+/*
+void add_point(const Point & poi)
+{
+	double min[2] = {poi.x , poi.y ,};
+	double max[2] = {poi.x , poi.y ,};
+	tree3.Insert(min , max , poi);
+}
+
+void del_point(int id)
+{
+	
+}
+void ask_poly(const Polygon & poly)
+{
+	
+}
+*/

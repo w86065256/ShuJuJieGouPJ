@@ -50,4 +50,10 @@ namespace yyy
 		a[k1][k2] = v;
 		return a;
 	}
+	
+	bool Box::inside(const Box & b)const
+	{
+		return 	b.lef <= lef && rig <= b.rig && 
+				b.bot <= bot && top <= b.top;
+	}
 }
