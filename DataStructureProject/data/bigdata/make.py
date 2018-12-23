@@ -5,7 +5,7 @@ COORD_MAX = 500000
 INT_MAX = (1 << 30) - 1
 MAX_POLY_SIZE = 100
 
-data_size = 100000
+data_size = 400000
 num_to_gene = 1
 file_name = "big_data_%d.in"
 
@@ -92,7 +92,10 @@ def ask_poly():
 	return new_data
 
 funcs = [add_poi , del_poi , ask_poi , add_poly , del_poly , ask_poly , ]
-possi = [100 , 80 , 20 , 40 , 30 , 30]
+#funcs = [add_poly , del_poly , ask_poi , add_poly , del_poly , ask_poi , ]
+#funcs = [add_poly , del_poly , ask_poi , ]
+funcs = [add_poi , del_poi , ask_poly , ]
+possi = [100 , 80 , 20 , 40 , 30 , 30] [ : len(funcs)]
 sum_of_possi = sum(possi)
 
 for num in range(num_to_gene):
@@ -106,11 +109,11 @@ for num in range(num_to_gene):
 
 		if now_data_size > next_step:
 			print ("now data_size = %d" % (now_data_size))
-			next_step += 1000
+			next_step += 100000
 
 		while True:
 			k = random.randint(0,sum_of_possi - 1)
-			for u in range(6):
+			for u in range( len(funcs) ):
 				if k < possi[u]:
 					break
 				k -= possi[u]

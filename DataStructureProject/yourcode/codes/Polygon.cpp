@@ -47,6 +47,7 @@ namespace yyy
 
 	bool Polygon::maybe_contain(const Box & b)const
 	{
+		return true;
 		return b.inside(box);
 	}
 

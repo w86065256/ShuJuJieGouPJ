@@ -28,7 +28,7 @@ namespace yyy
 		Point & operator /= (double v );
 
 		bool inside(const Box & b)const;
-		bool inside(const Polygon & b , int max_test = 3)const;
+		bool inside(const Polygon & b , int max_test = 1)const;
 
 		bool is_same(const Point & p)const;	//编号相同
 	};

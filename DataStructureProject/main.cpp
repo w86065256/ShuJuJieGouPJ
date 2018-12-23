@@ -8,6 +8,8 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <stdlib.h>
+#include <time.h>
 
 int environment_variable(0);
 
@@ -185,6 +187,8 @@ void QueryPolygon(std::fstream &fin, std::fstream &fout) {
 }
 
 int main() {
+    srand(time(0));
+    
     std::cout << "Hello, World!" << std::endl;
 
     std::fstream fin("test.in", std::fstream::in);

@@ -12,7 +12,7 @@ using namespace std;
 typedef long long ll;
 const int N=1E6+5;
 const int M=N*20;
-const int L=5E5;
+const int L=5E7;
 struct data_Point{
 	int x,y;
 }Point[N];
@@ -29,7 +29,7 @@ struct data_Poly{
 vector <int> tr0[M];
 vector <pair<int,int>> tr1[M],tr1_all[M];
 vector <data_Poly> Poly[N];
-int tot,to[M],lc[M],rc[M],root,ans_time[N],tot0,tot1;
+int tot,to[M],lc[M],rc[M],root,ans_time[N],tot0,tot1,fan_point[N],fan_poly[N];
 bool o_Point[N],o_Poly[N];
 vector <int> ans_G;
 map <int,int> to_point,to_poly; 
@@ -58,6 +58,7 @@ bool check_in(int t,int k,int l,int r,int id,int id2)
 void add(int t,int &p,int l,int r,int id,int id2,int k) // if k=0: Point else Poly; if t=0: x-axis else y-axis; 
 {
     if (check_out(t,k,l,r,id,id2)) return;
+    //cerr<<l<<" "<<r<<endl;
     if (!p) p=++tot;
     if (!k) tr0[p].push_back(id);
     if (check_in(t,k,l,r,id,id2))
@@ -122,15 +123,19 @@ void SetEnvironmentFromMixQuery() {
 int change(double x)
 {
 //	cerr<<x*100<<" "<<ceil(x*100)<<endl;
-    return ceil(x*100);
+    return ceil(x*100)+L;
 }
 
 void AddPointFromMixQuery(int id, double x, double y) {
-	id=to_point[id]=++tot0;
+	//cerr<<id<<endl;
+	fan_point[++tot0]=id;
+	id=to_point[id]=tot0;
+	//cerr<<id<<endl;
     x=change(x); y=change(y);
     Point[id].x=x;  Point[id].y=y;
-   // cerr<<x<<" "<<y<<endl;
-    add(0,root,-L,L,id,0,0);
+    //cerr<<Point[id].x<<" "<<Point[id].y<<endl;
+    add(0,root,0,2*L,id,0,0);
+    //cerr<<tot<<endl;
 }
 
 void DeletePointFromMixQuery(int id) {
@@ -142,12 +147,12 @@ std::vector<int> QueryPointFromMixQuery(double x, double y) {
 //	cerr<<x<<" "<<y<<endl;
 	x=change(x); y=change(y);
 //	cerr<<x<<" "<<y<<endl;
-	get_point(0,root,-L,L,x,y);
+	get_point(0,root,0,2*L,x,y);
 	vector <int> ans;
 	int u;
 	for (int i=0;i<ans_G.size();i++) if (ans_time[u=ans_G[i]])
 	{
-		ans.push_back(u); 
+		ans.push_back(fan_poly[u]); 
 		ans_time[u]=0;
 	}
 //	cerr<<ans_G.size()<<endl;
@@ -156,14 +161,18 @@ std::vector<int> QueryPointFromMixQuery(double x, double y) {
 }
 
 void AddPolygonFromMixQuery(int id, int n, std::vector<std::pair<double, double>> &polygon) {
-	id=to_poly[id]=++tot1;
+	fan_poly[++tot1]=id;
+	id=to_poly[id]=tot1;
+	//cerr<<id<<endl;
 	for (int i=0;i<n;i++) 
 	{
+	//	cerr<<i<<endl;
 		Poly[id].push_back(data_Poly(change(polygon[i].first),change(polygon[i].second),
 		change(polygon[(i+1)%n].first),change(polygon[(i+1)%n].second)));
 	//	cerr<<id<<" "<<i<<" "<<Poly[id][i].x1<<" "<<Poly[id][i].x2<<" "<<Poly[id][i].y1<<" "<<Poly[id][i].y2<<endl;
-		add(0,root,-L,L,id,i,1);
+		add(0,root,0,2*L,id,i,1);
 	}
+	//cerr<<id<<endl;
 }
 
 void DeletePolygonFromMixQuery(int id) {
@@ -174,7 +183,7 @@ void DeletePolygonFromMixQuery(int id) {
 std::vector<int> QueryPolygonFromMixQuery(int n, std::vector<std::pair<double, double>> &polygon) {
     for (int i=0;i<n;i++) 
 	{
-		get_poly(root,-L,L,data_Poly(change(polygon[i].first),change(polygon[i].second),
+		get_poly(root,0,2*L,data_Poly(change(polygon[i].first),change(polygon[i].second),
 		change(polygon[(i+1)%n].first),change(polygon[(i+1)%n].second)));
 	//	cerr<<id<<" "<<i<<" "<<Poly[id][i].x1<<" "<<Poly[id][i].x2<<" "<<Poly[id][i].y1<<" "<<Poly[id][i].y2<<endl;
 	}
@@ -182,7 +191,7 @@ std::vector<int> QueryPolygonFromMixQuery(int n, std::vector<std::pair<double, d
 	int u;
 	for (int i=0;i<ans_G.size();i++) if (ans_time[u=ans_G[i]])
 	{
-		ans.push_back(u); 
+		ans.push_back(fan_point[u]); 
 		ans_time[u]=0;
 	}
 	ans_G.clear();
@@ -206,7 +215,6 @@ void AddPoint(std::fstream &fin) {
     double y;
     fin >> id;
     fin >> x >> y;
-
     switch (environment_variable) {
         case 6: {
             AddPointFromMixQuery(id, x, y);
@@ -311,7 +319,7 @@ void QueryPolygon(std::fstream &fin, std::fstream &fout) {
 
 int main() {
    // std::cout << "Hello, World!" << std::endl;
-
+//	cerr<<-1<<endl;
     std::fstream fin("test.in", std::fstream::in);
     std::fstream fout("wxy.out", std::fstream::out);
 
@@ -328,9 +336,11 @@ int main() {
 
     int user_operation(0);
     while (fin >> user_operation) {
+    //	cout<<user_operation<<endl;
         switch (user_operation) {
             case 1: {
                 // Add Point
+           //     cerr<<1<<endl;
                 AddPoint(fin);
                 break;
             }
@@ -356,6 +366,8 @@ int main() {
             }
             case 6: {
                 // QueryPolygon
+                
+           //     cout<<1<<endl;
                 QueryPolygon(fin, fout);
                 break;
             }

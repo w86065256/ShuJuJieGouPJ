@@ -1,0 +1,3 @@
+*.out
+*.exe
+./DataStructureProject/run_test/main_wxy.cpp

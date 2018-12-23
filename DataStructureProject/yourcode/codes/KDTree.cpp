@@ -149,32 +149,10 @@ namespace yyy
 		lef = check(lef);
 		rig = check(rig);
 
-		int new_dir = dir ^ 1;
-
 		int k = p[dir] >= poi[dir];
 
 		if(!son(k))
-		{
-			Box old_box = box;
-			Box new_box = box.cut(dir , k^1 , poi[dir]);
-			
-			if(new_box.rig < new_box.lef)
-			{
-				printf("old_box : top : %.2f , lef : %.2f , bot : %.2f , rig :%.2f \n",
-					old_box.top , old_box.lef , old_box.bot , old_box.rig);
-				printf("new_box : top : %.2f , lef : %.2f , bot : %.2f , rig :%.2f \n",
-					new_box.top , new_box.lef , new_box.bot , new_box.rig);
-				printf("this_poi : %.2f , %.2f \n",
-					poi.x , poi.y);
-				printf("new_poi : %.2f , %.2f \n",
-					p.x , p.y);
-				printf("dir : %d \n",
-					dir);
-				exit(1);
-			}
-			
-			son(k) = new KDTNode(new_dir , p , new_box);
-		}
+			son(k) = new KDTNode(dir ^ 1 , p , box.cut(dir , k^1 , poi[dir]));
 		else
 			son(k)->add(p);
 
@@ -185,24 +163,6 @@ namespace yyy
 	{
 		if(d == 0)
 			return;
-		if(! poly.cross_or_inside(d->box) )
-		{
-			if(d->poi.inside(poly))
-			{
-				printf("exception occured.\n");
-				printf("poi : %.2f , %.2f\n",d->poi[0] , d->poi[1]);
-				printf("box : top : %.2f , lef : %.2f , bot : %.2f , rig :%.2f \n",
-					d->box.top , d->box.lef , d->box.bot , d->box.rig);
-				printf("poly : \n");
-				for(int i = 0;i < poly.size();i++)
-				{
-					printf("\t>> %.2f , %.2f\n",poly[i][0] , poly[i][1]);
-				}
-
-				exit(1);
-			}
-			//return;
-		}
 		if( (!d->deled) && d->poi.inside(poly))
 			res.push_back(d->poi);
 		ask_poly(d->son(0) , poly , res);
